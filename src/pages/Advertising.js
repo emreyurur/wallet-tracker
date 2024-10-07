@@ -11,9 +11,10 @@ window.Buffer = Buffer;
 
 const Advertising = () => {
   const [purchasingStates, setPurchasingStates] = useState({});
+  const [successModal, setSuccessModal] = useState({ show: false, serviceName: '' });
 
   const purchaseService = async (serviceIndex) => {
-    setPurchasingStates(prev => ({ ...prev, [serviceIndex]: true }));
+    setPurchasingStates((prev) => ({ ...prev, [serviceIndex]: true }));
 
     try {
       if (window.solana && window.solana.isPhantom) {
@@ -21,64 +22,84 @@ const Advertising = () => {
         await window.solana.connect();
 
         const walletPublicKey = new PublicKey(window.solana.publicKey);
-        const recipientPublicKey = new PublicKey("Af139PJn2nuCBA7vJQeuZfZHskXogyuhZVFvD2dPBg5q");
+        const recipientPublicKey = new PublicKey('Af139PJn2nuCBA7vJQeuZfZHskXogyuhZVFvD2dPBg5q');
 
         const { blockhash } = await connection.getLatestBlockhash();
+
+        // Check wallet balance before attempting the transfer
+        const balance = await connection.getBalance(walletPublicKey);
+        const servicePriceLamports = services[serviceIndex].price * 1000000000; // Convert SOL to lamports
+
+        if (balance < servicePriceLamports) {
+          alert("Insufficient SOL balance for this transaction. Please top up your wallet.");
+          setPurchasingStates((prev) => ({ ...prev, [serviceIndex]: false }));
+          return;
+        }
 
         const transaction = new Transaction().add(
           SystemProgram.transfer({
             fromPubkey: walletPublicKey,
             toPubkey: recipientPublicKey,
-            lamports: services[serviceIndex].price * 1000000000, // Convert SOL to lamports
+            lamports: servicePriceLamports, // Convert SOL to lamports
           })
         );
 
         transaction.recentBlockhash = blockhash;
         transaction.feePayer = walletPublicKey;
 
+        // Attempt the transaction
         const signedTransaction = await window.solana.signAndSendTransaction(transaction);
         await connection.confirmTransaction(signedTransaction.signature, 'confirmed');
 
-        alert("Service purchased successfully!");
+        setSuccessModal({ show: true, serviceName: services[serviceIndex].title });
       } else {
         alert("Phantom Wallet is not available. Please install it first.");
       }
     } catch (error) {
       console.error("Transaction failed", error);
-      alert("Purchase failed. Please try again.");
+      if (error.logs) {
+        console.error("Transaction logs:", error.logs);
+      }
+      alert(`Purchase failed. ${error.message}`);
     } finally {
-      setPurchasingStates(prev => ({ ...prev, [serviceIndex]: false }));
+      setPurchasingStates((prev) => ({ ...prev, [serviceIndex]: false }));
     }
+  };
+
+  const closeModal = () => {
+    setSuccessModal({ show: false, serviceName: '' });
   };
 
   const services = [
     {
-      title: "Advertising Service",
+      title: 'Advertising Service',
       image: adServiceImage,
-      price: 2.5,
-      description: "Boost your project's visibility with our comprehensive advertising service. We create and manage targeted ad campaigns across multiple platforms to maximize your reach and engagement.",
+      price: 0.5,
+      description:
+        'Boost your project\'s visibility with our comprehensive advertising service. We create and manage targeted ad campaigns across multiple platforms to maximize your reach and engagement.',
       features: [
-        "Cross-platform ad campaign management",
-        "Audience targeting and segmentation",
-        "Ad creative design and copywriting",
-        "Performance tracking and optimization",
-        "Regular reporting and insights"
-      ]
+        'Cross-platform ad campaign management',
+        'Audience targeting and segmentation',
+        'Ad creative design and copywriting',
+        'Performance tracking and optimization',
+        'Regular reporting and insights',
+      ],
     },
     {
-      title: "Marketing Service",
+      title: 'Marketing Service',
       image: marketingServiceImage,
       price: 3,
-      description: "Take your project to the next level with our full-scale marketing service. We develop and execute tailored marketing strategies to increase brand awareness and drive user acquisition.",
+      description:
+        'Take your project to the next level with our full-scale marketing service. We develop and execute tailored marketing strategies to increase brand awareness and drive user acquisition.',
       features: [
-        "Comprehensive marketing strategy development",
-        "Content marketing and SEO optimization",
-        "Social media management and community building",
-        "Influencer partnerships and collaborations",
-        "Email marketing campaigns",
-        "Analytics and ROI tracking"
-      ]
-    }
+        'Comprehensive marketing strategy development',
+        'Content marketing and SEO optimization',
+        'Social media management and community building',
+        'Influencer partnerships and collaborations',
+        'Email marketing campaigns',
+        'Analytics and ROI tracking',
+      ],
+    },
   ];
 
   return (
@@ -87,10 +108,18 @@ const Advertising = () => {
         <nav className="flex justify-between items-center">
           <div className="font-bold text-xl">▲ Positivus</div>
           <div className="hidden md:flex space-x-6">
-            <Link to="/" className="text-gray-600 hover:text-gray-900">Home</Link>
-            <Link to="/courses" className="text-gray-600 hover:text-gray-900">Courses</Link>
-            <Link to="#" className="text-gray-600 hover:text-gray-900">About us</Link>
-            <Link to="#" className="text-gray-600 hover:text-gray-900">Contact</Link>
+            <Link to="/" className="text-gray-600 hover:text-gray-900">
+              Home
+            </Link>
+            <Link to="/courses" className="text-gray-600 hover:text-gray-900">
+              Courses
+            </Link>
+            <Link to="#" className="text-gray-600 hover:text-gray-900">
+              About us
+            </Link>
+            <Link to="#" className="text-gray-600 hover:text-gray-900">
+              Contact
+            </Link>
           </div>
           <button className="bg-white text-black border border-black px-4 py-2 rounded-full">
             Connect Wallet
@@ -104,11 +133,7 @@ const Advertising = () => {
           {services.map((service, index) => (
             <div key={index} className="bg-white rounded-xl shadow-md overflow-hidden flex flex-col">
               <div className="h-48 overflow-hidden">
-                <img 
-                  className="w-full h-full object-contain" 
-                  src={service.image} 
-                  alt={service.title} 
-                />
+                <img className="w-full h-full object-contain" src={service.image} alt={service.title} />
               </div>
               <div className="p-8 flex-grow flex flex-col justify-between">
                 <div>
@@ -143,6 +168,21 @@ const Advertising = () => {
           ))}
         </div>
       </main>
+
+      {successModal.show && (
+  <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+    <div className="bg-white p-8 rounded-lg shadow-lg text-center">
+      <h2 className="text-2xl font-bold mb-4">Purchase Successful! 🎉</h2>
+      <p className="mb-4">You have successfully purchased the {successModal.courseTitle} course.</p>
+      <button
+        onClick={closeModal}
+        className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-full transition duration-300 ease-in-out"
+      >
+        Close
+      </button>
+    </div>
+  </div>
+)}
     </div>
   );
 };

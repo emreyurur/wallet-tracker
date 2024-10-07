@@ -13,6 +13,7 @@ window.Buffer = Buffer;
 
 const Courses = () => {
   const [purchasingStates, setPurchasingStates] = useState({});
+  const [successModal, setSuccessModal] = useState({ show: false, courseTitle: '' });
 
   const purchaseCourse = async (courseIndex) => {
     setPurchasingStates(prev => ({ ...prev, [courseIndex]: true }));
@@ -51,8 +52,8 @@ const Courses = () => {
         // Confirm the transaction
         await connection.confirmTransaction(signedTransaction.signature, 'confirmed');
 
-        // Show success message
-        alert(`Congratulations! You have successfully purchased the ${courses[courseIndex].title} course. Happy learning!`);
+        // Show success modal
+        setSuccessModal({ show: true, courseTitle: courses[courseIndex].title });
       } else {
         alert("Phantom Wallet is not available. Please install it first.");
       }
@@ -62,6 +63,10 @@ const Courses = () => {
     } finally {
       setPurchasingStates(prev => ({ ...prev, [courseIndex]: false }));
     }
+  };
+
+  const closeModal = () => {
+    setSuccessModal({ show: false, courseTitle: '' });
   };
 
   const courses = [
@@ -125,6 +130,23 @@ const Courses = () => {
           ))}
         </div>
       </main>
+
+      {/* Success Modal */}
+      {successModal.show && (
+  <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+    <div className="bg-white p-8 rounded-lg shadow-lg text-center">
+      <h2 className="text-2xl font-bold mb-4">Purchase Successful! 🎉</h2>
+      <p className="mb-4">You have successfully purchased the {successModal.courseTitle} course.</p>
+      <button
+        onClick={closeModal}
+        className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-full transition duration-300 ease-in-out"
+      >
+        Close
+      </button>
+    </div>
+  </div>
+)}
+
     </div>
   );
 };
