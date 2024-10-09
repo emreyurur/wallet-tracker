@@ -18,5 +18,8 @@ model Spending {
   id    Int     @id @default(autoincrement())
   amount Float
   category String
-  
+ walletAddress String 
 }
+
+
+
