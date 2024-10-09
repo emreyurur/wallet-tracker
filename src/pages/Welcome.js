@@ -59,11 +59,11 @@ const Welcome = () => {
             <CustomPhantomButton
               onPress={handleConnectPhantom}
             />
-           {/*  <CustomButton
+           {<CustomButton
               onPress={handleNavigateToTabs}
               title="Go to Main App"
               style={styles.navigationButton}
-            /> */}
+            /> }
           </>
         )}
       </View>
@@ -77,12 +77,11 @@ const CustomPhantomButton = ({ onPress }) => (
     <Text style={styles.buttonText}>Connect Your Phantom Wallet</Text>
   </TouchableOpacity>
 );
-
-/* const CustomButton = ({ onPress, title, style }) => (
+const CustomButton = ({ onPress, title, style }) => (
   <TouchableOpacity onPress={onPress} style={[styles.button, style]}>
     <Text style={styles.buttonText}>{title}</Text>
   </TouchableOpacity>
-); */
+);
 
 const styles = StyleSheet.create({
   container: {
@@ -102,7 +101,7 @@ const styles = StyleSheet.create({
   button: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#7E57C2', // Color adjusted to complement logo
+    backgroundColor: '#ac9cfc', // Color adjusted to complement logo
     paddingVertical: 12,
     paddingHorizontal: 24,
     borderRadius: 30,

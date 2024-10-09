@@ -4,13 +4,16 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
 
-// Import your screen components
+
 import Welcome from './src/pages/Welcome';
 import Home from './src/pages/Home';
 import Wallet from './src/pages/Wallet';
 import Profile from './src/pages/Profile';
+import Education from './src/pages/Education';
+import NFT from './src/pages/NFT';
+import Investment from './src/pages/Investment';
 
-// Import PNG icons
+
 import homeIcon from './assets/home.png';
 import walletIcon from './assets/wallet.png';
 import profileIcon from './assets/profile.png';
@@ -22,8 +25,12 @@ function TabNavigator() {
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
-        headerShown: false, // This hides the header for all tab screens
-        tabBarShowLabel: false, // This hides the text under the icons
+        headerShown: false, 
+        tabBarShowLabel: false,
+        tabBarStyle: {
+          backgroundColor: '#1E1E1E',
+          borderTopWidth: 0,
+        },
         tabBarIcon: ({ focused, color, size }) => {
           let iconSource;
           if (route.name === 'Home') {
@@ -34,18 +41,18 @@ function TabNavigator() {
             iconSource = profileIcon;
           }
           return (
-            <Image 
-              source={iconSource} 
-              style={{ 
-                width: size, 
-                height: size, 
-                tintColor: focused ? '#007AFF' : 'gray' 
-              }} 
+            <Image
+              source={iconSource}
+              style={{
+                width: size,
+                height: size,
+                tintColor: focused ? '#FFFFFF' : '#888888'
+              }}
             />
           );
         },
-        tabBarActiveTintColor: '#007AFF',
-        tabBarInactiveTintColor: 'gray',
+        tabBarActiveTintColor: '#FFFFFF',
+        tabBarInactiveTintColor: '#888888',
       })}
     >
       <Tab.Screen name="Home" component={Home} />
@@ -61,6 +68,9 @@ export default function App() {
       <Stack.Navigator screenOptions={{ headerShown: false }}>
         <Stack.Screen name="Welcome" component={Welcome} />
         <Stack.Screen name="MainTabs" component={TabNavigator} />
+        <Stack.Screen name="Education" component={Education}/>
+        <Stack.Screen name="NFT" component={NFT}/>
+        <Stack.Screen name="Investment" component={Investment}/>
       </Stack.Navigator>
     </NavigationContainer>
   );
