@@ -1,7 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, SafeAreaView, Image, ScrollView, TouchableOpacity } from 'react-native';
 
-// Import images (replace these with your actual image imports)
 import profilePic from '../../assets/profile.png';
 import electricalIcon from '../../assets/export.png';
 import othersIcon from '../../assets/assistant.png';
@@ -122,7 +121,7 @@ const styles = StyleSheet.create({
   recommendedIcon: {
     width: 60,
     height: 60,
-    borderRadius: 10, // Changed to 10 for slightly rounded corners
+    borderRadius: 10, 
     backgroundColor: '#2A2A2A',
   },
   recommendedName: {
