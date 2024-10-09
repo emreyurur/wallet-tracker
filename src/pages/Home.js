@@ -8,6 +8,7 @@ const screenWidth = Dimensions.get('window').width;
 const Home = () => {
   const navigation = useNavigation();
 
+  // Raw data
   const rawData = [
     { name: 'NFT', value: 50, color: '#36A2EB' },
     { name: 'DeFi', value: 50, color: '#FFCE56' },
@@ -16,20 +17,25 @@ const Home = () => {
     { name: 'Stake', value: 50, color: '#FF9F40' },
     { name: 'Donate', value: 10, color: '#4CAF50' },
     { name: 'Gaming', value: 50, color: '#FFCE56' },
-    { name: 'Entertainment', value: 50, color: '#FFCE56' },
+    { name: 'Entertainment', value: 50, color: '#9522AA' },
+    { name: 'Health', value: 50, color: '#123466' },
+    { name: 'Others', value: 50, color: '#BBC256' },
   ];
 
+  // Total value of all categories
   const total = rawData.reduce((sum, item) => sum + item.value, 0);
 
+  // Mapping raw data to percentage based data
   const data = rawData.map(item => ({
     name: item.name,
     population: item.value,
     color: item.color,
     legendFontColor: '#FFFFFF',
     legendFontSize: 12,
-    percentage: ((item.value / total) * 100).toFixed(1),
+    percentage: ((item.value / total) * 100).toFixed(1), // Calculating percentage
   }));
 
+  // Filter data for non-zero percentages
   const filteredData = data.filter(item => item.percentage > 0);
 
   const chartConfig = {
@@ -64,12 +70,15 @@ const Home = () => {
             ))}
           </View>
         </View>
-        
+
         <View style={styles.sectionContainer}>
           <Text style={styles.title}>Distribution by Categories</Text>
           <View style={styles.chartContainer}>
-            <PieChart
-              data={filteredData}
+          <PieChart
+              data={filteredData.map(item => ({
+                ...item,
+                name: `${item.name} (${item.percentage}%)`,
+              }))}
               width={screenWidth - 64}
               height={220}
               chartConfig={chartConfig}
